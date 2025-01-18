@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <set>
 #include <string>
 #include <random>
 #include <filesystem>
@@ -42,21 +43,45 @@ private:
         }
     }
 
-    void generateSolution() {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(1, 9);
+   void generateSolution() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1, 9);
 
-        for (int i = 1; i < height - 1; i++) {
-            for (int j = 1; j < width - 1; j++) {
-                if (grid[i][j] == "_") {
+    // Track used numbers in rows and columns
+    std::vector<std::set<int>> rowUsed(height);
+    std::vector<std::set<int>> colUsed(width);
+
+    for (int i = 1; i < height - 1; i++) {
+        for (int j = 1; j < width - 1; j++) {
+            if (grid[i][j] == "_") {
+                int attempts = 0;
+                bool placed = false;
+
+                // Try placing a valid number
+                while (!placed && attempts < 9) {
                     int num = dis(gen);
-                    grid[i][j] = std::to_string(num);
-                    solutionGrid[i][j] = std::to_string(num);
+                    if (rowUsed[i].count(num) == 0 && colUsed[j].count(num) == 0) {
+                        // Place the number
+                        grid[i][j] = std::to_string(num);
+                        solutionGrid[i][j] = std::to_string(num);
+                        rowUsed[i].insert(num);
+                        colUsed[j].insert(num);
+                        placed = true;
+                    }
+                    attempts++;
+                }
+
+                // If no valid number can be placed, reset the cell
+                if (!placed) {
+                    grid[i][j] = "_";
+                    solutionGrid[i][j] = "_";
                 }
             }
         }
     }
+}
+
 
     void placeClues() {
         for (int i = 0; i < height; i++) {
@@ -66,7 +91,7 @@ private:
                     int verticalSum = getSum(i + 1, j, "v");
 
                     if (horizontalSum > 0 && verticalSum > 0) {
-                        grid[i][j] = "(" + std::to_string(horizontalSum) + "-" + std::to_string(verticalSum) + ")";
+                        grid[i][j] = "(" + std::to_string(verticalSum) + "-" + std::to_string(horizontalSum) + ")";
                     }
                     else if (horizontalSum > 0) {
                         grid[i][j] = "(" + std::to_string(horizontalSum) + ")";
