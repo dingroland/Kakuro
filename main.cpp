@@ -24,11 +24,11 @@ private:
         // Add borders
         for (int i = 0; i < height; i++) {
             grid[i][0] = "#";              // Left border
-            grid[i][width - 1] = "#";      // Right border
+            //grid[i][width - 1] = "#";      // Right border
         }
         for (int j = 0; j < width; j++) {
             grid[0][j] = "#";              // Top border
-            grid[height - 1][j] = "#";     // Bottom border
+            //grid[height - 1][j] = "#";     // Bottom border
         }
 
         // Add random walls inside the grid
